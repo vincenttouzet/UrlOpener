@@ -126,8 +126,8 @@ class CookieMemoryStorage implements CookieStorageInterface
         $cookies = array();
         foreach ($this->cookies as $i=>$c) {
             $isSubDomain = false;
-            if ( substr($domain, 0, 1) === '.' 
-                && strstr($domain, $c->getDomain()) !== -1
+            if ( substr($c->getDomain(), 0, 1) === '.' 
+                && strstr($c->getDomain(), $domain) !== -1
             ) {
                 $isSubDomain = true;
             }

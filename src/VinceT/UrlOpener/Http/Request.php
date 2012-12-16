@@ -125,7 +125,7 @@ class Request
      */
     public function setUrl($url)
     {
-        if ( !preg_match('/^http:\/\//', $url) ) {
+        if ( !preg_match('/^https?:\/\//', $url) ) {
             if ( substr($url, 0, 1) === '/' ) {
                 $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
             } else {
