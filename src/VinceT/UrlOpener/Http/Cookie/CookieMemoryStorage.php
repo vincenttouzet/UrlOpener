@@ -71,6 +71,16 @@ class CookieMemoryStorage implements CookieStorageInterface
     }
 
     /**
+     * Gets the number of cookies stored
+     *
+     * @return Integer
+     */
+    public function count()
+    {
+        return count($this->cookies);
+    }
+
+    /**
      * Gets index of a cookie in storage
      * -1 if cookie is not in storage
      *
@@ -162,5 +172,25 @@ class CookieMemoryStorage implements CookieStorageInterface
                 unset($this->cookies[$i]);
             }
         }
+    }
+
+    /**
+     * Save cookies
+     *
+     * @return Boolean
+     */
+    public function save()
+    {
+        return true;
+    }
+
+    /**
+     * Load cookies
+     *
+     * @return Boolean
+     */
+    public function load()
+    {
+        return true;
     }
 }

@@ -47,33 +47,13 @@ class Cookie
      */
     public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
-        // from PHP source code
-        if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
-            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
-        }
-
-        if (empty($name)) {
-            throw new \InvalidArgumentException('The cookie name cannot be empty.');
-        }
-
-        // convert expiration time to a Unix timestamp
-        if ($expire instanceof \DateTime) {
-            $expire = $expire->format('U');
-        } elseif (!is_numeric($expire)) {
-            $expire = strtotime($expire);
-
-            if (false === $expire || -1 === $expire) {
-                throw new \InvalidArgumentException('The cookie expiration time is not valid.');
-            }
-        }
-
-        $this->name = $name;
-        $this->value = $value;
-        $this->domain = $domain;
-        $this->expire = $expire;
-        $this->path = empty($path) ? '/' : $path;
-        $this->secure = (Boolean) $secure;
-        $this->httpOnly = (Boolean) $httpOnly;
+        $this->setName($name);
+        $this->setExpireTime($expire);
+        $this->setValue($value);
+        $this->setDomain($domain);
+        $this->setPath($path);
+        $this->setSecure($secure);
+        $this->setHttpOnly($httpOnly);
     }
 
     /**
@@ -136,12 +116,12 @@ class Cookie
         $str = urlencode($this->getName()).'=';
 
         if ('' === (string) $this->getValue()) {
-            $str .= 'deleted; expires='.gmdate("D, d-M-Y H:i:s T", time() - 31536001);
+            $str .= 'deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001);
         } else {
             $str .= urlencode($this->getValue());
 
-            if ($this->getExpiresTime() !== 0) {
-                $str .= '; expires='.gmdate("D, d-M-Y H:i:s T", $this->getExpiresTime());
+            if ($this->getExpireTime() !== 0) {
+                $str .= '; expires='.gmdate('D, d-M-Y H:i:s T', $this->getExpireTime());
             }
         }
 
@@ -185,6 +165,14 @@ class Cookie
      */
     public function setName($name)
     {
+        // from PHP source code
+        if (preg_match('/[=,; \t\r\n\013\014]/', $name)) {
+            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
+        }
+
+        if (empty($name)) {
+            throw new \InvalidArgumentException('The cookie name cannot be empty.');
+        }
         $this->name = $name;
         return $this;
     }
@@ -248,7 +236,7 @@ class Cookie
      *
      * @api
      */
-    public function getExpiresTime()
+    public function getExpireTime()
     {
         return $this->expire;
     }
@@ -262,6 +250,16 @@ class Cookie
      */
     public function setExpireTime($expire)
     {
+        // convert expiration time to a Unix timestamp
+        if ($expire instanceof \DateTime) {
+            $expire = $expire->format('U');
+        } elseif (!is_numeric($expire)) {
+            $expire = strtotime($expire);
+
+            if (false === $expire || -1 === $expire) {
+                throw new \InvalidArgumentException('The cookie expiration time is not valid.');
+            }
+        }
         $this->expire = $expire;
         return $this;
     }
@@ -288,7 +286,7 @@ class Cookie
      */
     public function setPath($path)
     {
-        $this->path = $path;
+        $this->path = empty($path) ? '/' : $path;
         return $this;
     }
     
@@ -314,7 +312,7 @@ class Cookie
      */
     public function setSecure($secure)
     {
-        $this->secure = $secure;
+        $this->secure = (Boolean)$secure;
         return $this;
     }
     
@@ -339,7 +337,7 @@ class Cookie
      */
     public function setHttpOnly($httpOnly)
     {
-        $this->httpOnly = $httpOnly;
+        $this->httpOnly = (Boolean)$httpOnly;
         return $this;
     }
     
@@ -353,7 +351,7 @@ class Cookie
      */
     public function isCleared()
     {
-        return $this->expire < time();
+        return ($this->expire !== 0 && $this->expire < time());
     }
 
     /**
@@ -366,8 +364,8 @@ class Cookie
     public function equals(Cookie $cookie)
     {
         $ret = true;
-        $ret = $ret && ($cookie->getDomain() === $this->getDomain());
         $ret = $ret && ($cookie->getName() === $this->getName());
+        $ret = $ret && ($cookie->getDomain() === $this->getDomain());
         $ret = $ret && ($cookie->isSecure() === $this->isSecure());
         $ret = $ret && ($cookie->isHttpOnly() === $this->isHttpOnly());
         return $ret;

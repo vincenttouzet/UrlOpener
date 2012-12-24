@@ -53,6 +53,13 @@ interface CookieStorageInterface
     public function contains(Cookie $cookie);
 
     /**
+     * Gets the number of cookies stored
+     *
+     * @return Integer
+     */
+    public function count();
+
+    /**
      * Gets index of a cookie in storage
      * -1 if cookie is not in storage
      *
@@ -94,4 +101,18 @@ interface CookieStorageInterface
      * @return null
      */
     public function removeExpired();
+
+    /**
+     * Save cookies
+     *
+     * @return Boolean
+     */
+    public function save();
+
+    /**
+     * Load cookies
+     *
+     * @return Boolean
+     */
+    public function load();
 }
