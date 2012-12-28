@@ -32,7 +32,7 @@ interface CookieStorageInterface
      *
      * @return null
      */
-    public function add(Cookie $cookie);
+    public function store(Cookie $cookie);
 
     /**
      * Remove a cookie
@@ -68,16 +68,6 @@ interface CookieStorageInterface
      * @return Integer
      */
     public function indexOf(Cookie $cookie);
-
-    /**
-     * Retrieve a cookie from the storage
-     *
-     * @param Cookie $cookie [description]
-     *
-     * @return Cookie|null
-     */
-    public function getCookie(Cookie $cookie);
-
 
     /**
      * Gets cookies for a given domain

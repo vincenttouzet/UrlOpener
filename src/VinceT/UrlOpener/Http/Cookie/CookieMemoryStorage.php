@@ -33,7 +33,7 @@ class CookieMemoryStorage implements CookieStorageInterface
      *
      * @return null
      */
-    public function add(Cookie $cookie)
+    public function store(Cookie $cookie)
     {
         $i = $this->indexOf($cookie);
         if ( $i !== -1 ) {
@@ -99,32 +99,6 @@ class CookieMemoryStorage implements CookieStorageInterface
     }
 
     /**
-     * Retrieve a cookie from the storage
-     *
-     * @param Cookie $cookie [description]
-     *
-     * @return Cookie|null
-     */
-    public function getCookie(Cookie $cookie)
-    {
-        $i = $this->indexOf($cookie);
-        if ( $i !== -1 ) {
-            return $this->cookies[$i];
-        }
-        return null;
-    }
-
-    /**
-     * Gets cookie list
-     *
-     * @return array
-     */
-    public function getCookies()
-    {
-        return $this->cookies;
-    }
-
-    /**
      * Gets cookies for a given domain
      *
      * @param string $domain [description]
@@ -135,15 +109,12 @@ class CookieMemoryStorage implements CookieStorageInterface
     {
         $cookies = array();
         foreach ($this->cookies as $i=>$c) {
-            $isSubDomain = false;
-            if ( substr($c->getDomain(), 0, 1) === '.' 
-                && strstr($c->getDomain(), $domain) !== -1
-            ) {
-                $isSubDomain = true;
+            $pattern = str_replace('.', '\\.', $c->getDomain());
+            if ( $pattern[0] === '\\' ) {
+                $pattern = '(.*\.)?'.substr($pattern, 2);
             }
-            if ( $c->getDomain() === $domain
-                || $isSubDomain
-            ) {
+            $pattern = sprintf('/^%s$/', $pattern);
+            if ( preg_match($pattern, $domain) ) {
                 $cookies[] = $c;
             }
         }

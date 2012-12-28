@@ -1,6 +1,6 @@
 <?php
 
-require_once '../src/autoload.php';
+require_once dirname(__FILE__).'/../src/autoload.php';
 
 use VinceT\UrlOpener\UrlOpener;
 
@@ -8,7 +8,7 @@ print '<pre>';
 
 $urlOpener = new UrlOpener();
 
-$response = $urlOpener->open('pages/headers.php');
+$response = $urlOpener->open('http://www.urlopener.localhost/examples/pages/headers.php');
 
 print $response->getContent().PHP_EOL;
 

@@ -1,7 +1,11 @@
 <?php
 
 if ( $_COOKIE['auth'] == 'ok' ) {
-    echo 'OK';
+    if ( $_COOKIE['name'] === 'admin' ) {
+        echo 'Hello admin';
+    } else {
+        echo 'OK';
+    }
 } else {
     echo 'KO';
 }

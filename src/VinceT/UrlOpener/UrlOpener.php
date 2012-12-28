@@ -8,15 +8,6 @@
  * @license  MIT License view the LICENSE file that was distributed with this source code.
  * @link     https://github.com/vincenttouzet/UrlOpener
  */
-/**
- * This file is part of VinceTUrlOpener
- *
- * @category VinceT
- * @package  UrlOpener
- * @author   Vincent Touzet <vincent.touzet@gmail.com>
- * @license  MIT License view the LICENSE file that was distributed with this source code.
- * @link     https://github.com/vincenttouzet/UrlOpener
- */
 
 namespace VinceT\UrlOpener;
 
@@ -26,7 +17,7 @@ use VinceT\UrlOpener\Http\Cookie\Cookie;
 use VinceT\UrlOpener\Http\Cookie\CookieMemoryStorage;
 
 /**
- * This file is part of VinceTUrlOpener
+ * UrlOpener class
  *
  * @category VinceT
  * @package  UrlOpener
@@ -75,7 +66,7 @@ class UrlOpener
                 if ( !$cookie->getDomain() ) {
                     $cookie->setDomain($request->getHost());
                 }
-                $this->_cookieStorage->add($cookie);
+                $this->_cookieStorage->store($cookie);
             }
         }
         return $response;

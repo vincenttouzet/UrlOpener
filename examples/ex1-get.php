@@ -1,6 +1,6 @@
 <?php
 
-require_once '../src/autoload.php';
+require_once dirname(__FILE__).'/../src/autoload.php';
 
 use VinceT\UrlOpener\UrlOpener;
 
@@ -12,6 +12,6 @@ $urlOpener = new UrlOpener();
 //      - server relative (ex: /examples/pages/get.html)
 //      - path relative   (ex: pages/get.html)
 // For the relative url it uses the HTTP_HOST and REQUEST_URI in $_SERVER
-$response = $urlOpener->open('pages/get.html');
+$response = $urlOpener->open('http://www.urlopener.localhost/examples/pages/get.html');
 
 print $response->getContent();

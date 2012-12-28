@@ -47,14 +47,14 @@ class Request
      */
     public function open()
     {
-        if ( !$this->getUrl() ) {
+        if ( !$this->_url ) {
             throw new RequestException('No url given', 1);
         }
         $opts = array();
         // check if run from specific IP
-        if ( $this->getIp() ) {
+        if ( $this->_ip ) {
             $opts['socket'] = array(
-                'bindto' => $$this->getIp().':0'
+                'bindto' => $this->_ip.':0'
             );
         }
         $header = '';
@@ -77,7 +77,7 @@ class Request
         if ( $this->_headers ) {
             $header .= implode(PHP_EOL, $this->_headers);
         }
-        $datas = $this->getPostDatas();
+        $datas = $this->_postDatas;
         if ( is_array($datas) && count($datas) > 0 ) {
             // POST datas
             $postdata = http_build_query($datas);
@@ -93,27 +93,12 @@ class Request
                 'header'=>'Content-Type: text/html; charset=utf-8'.PHP_EOL.$header 
             );
         }
-        if ( count($opts) > 0 ) {
-            // use context
-            $context  = stream_context_create($opts);
-        } else {
-            // make normal request
-            $context = null;
-        }
-        $res = file_get_contents($this->getUrl(), false, $context);
+        // use context
+        $context  = stream_context_create($opts);
+        $res = file_get_contents($this->_url, false, $context);
         $this->_responseHeaders = $http_response_header;
 
         return $res;
-    }
-
-    /**
-     * getUrl
-     * 
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->_url;
     }
     
     /**
@@ -126,13 +111,7 @@ class Request
     public function setUrl($url)
     {
         if ( !preg_match('/^https?:\/\//', $url) ) {
-            if ( substr($url, 0, 1) === '/' ) {
-                $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
-            } else {
-                $file = basename($_SERVER['REQUEST_URI']);
-                $path = str_replace($file, '', $_SERVER['REQUEST_URI']);
-                $url = 'http://'.$_SERVER['HTTP_HOST'].$path.$url;
-            }
+            throw new \InvalidArgumentException(sprintf('Invalid url "%s"', $url), 1);
         }
         $this->_url = $url;
         $arr = parse_url($url);
@@ -340,16 +319,6 @@ class Request
         $this->_fragment = $fragment;
         return $this;
     }
-
-    /**
-     * getPostDatas
-     * 
-     * @return array
-     */
-    public function getPostDatas()
-    {
-        return $this->_postDatas;
-    }
     
     /**
      * setPostDatas
@@ -362,16 +331,6 @@ class Request
     {
         $this->_postDatas = $postDatas;
         return $this;
-    }
-
-    /**
-     * getCookies
-     * 
-     * @return array
-     */
-    public function getCookies()
-    {
-        return $this->_cookies;
     }
     
     /**
@@ -386,16 +345,6 @@ class Request
         $this->_cookies = $cookies;
         return $this;
     }
-
-    /**
-     * getHeaders
-     * 
-     * @return array
-     */
-    public function getHeaders()
-    {
-        return $this->_headers;
-    }
     
     /**
      * setHeaders
@@ -408,17 +357,6 @@ class Request
     {
         $this->_headers = $headers;
         return $this;
-    }
-    
-
-    /**
-     * getIp
-     * 
-     * @return string
-     */
-    public function getIp()
-    {
-        return $this->_ip;
     }
     
     /**
