@@ -60,6 +60,13 @@ interface CookieStorageInterface
     public function count();
 
     /**
+     * Gets all the cookies
+     *
+     * @return array
+     */
+    public function all();
+
+    /**
      * Gets index of a cookie in storage
      * -1 if cookie is not in storage
      *

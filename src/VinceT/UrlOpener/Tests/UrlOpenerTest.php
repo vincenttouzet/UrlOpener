@@ -34,6 +34,7 @@ class UrlOpenerTest extends \PHPUnit_Framework_TestCase
         $urlOpener = new UrlOpener();
         $response = $urlOpener->open('http://www.urlopener.localhost/examples/pages/get.html');
         $this->assertEquals('This file is loaded with UrlOpener', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**

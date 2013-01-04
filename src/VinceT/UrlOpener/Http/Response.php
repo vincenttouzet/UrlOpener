@@ -11,6 +11,8 @@
 
 namespace VinceT\UrlOpener\Http;
 
+use VinceT\UrlOpener\Http\Header\HeaderBag;
+
 /**
  * Response
  *
@@ -24,6 +26,21 @@ class Response
 {
     private $_headers = array();
     private $_content = null;
+
+    /**
+     * Gets the response status code
+     *
+     * @return string
+     */
+    public function getStatusCode()
+    {
+        $header = $this->_headers->get(0);
+        $code = null;
+        if ( $header ) {
+            list($http, $code, $message) = explode(' ', $header, 3);
+        }
+        return $code;
+    }
 
     /**
      * getHeaders
@@ -44,14 +61,15 @@ class Response
      */
     public function setHeaders($headers)
     {
-        $this->_headers = $headers;
+        $this->_headers = new HeaderBag();
+        $this->_headers->setRawHeaders($headers);
         return $this;
     }
 
     /**
      * getContent
      * 
-     * @return [type]
+     * @return string
      */
     public function getContent()
     {
@@ -70,6 +88,5 @@ class Response
         $this->_content = $content;
         return $this;
     }
-    
     
 }

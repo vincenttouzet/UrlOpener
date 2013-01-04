@@ -81,6 +81,16 @@ class CookieMemoryStorage implements CookieStorageInterface
     }
 
     /**
+     * Gets all the cookies
+     *
+     * @return array
+     */
+    public function all()
+    {
+        return $this->cookies;
+    }
+
+    /**
      * Gets index of a cookie in storage
      * -1 if cookie is not in storage
      *

@@ -12,6 +12,7 @@
 namespace VinceT\UrlOpener\Http;
 
 use VinceT\UrlOpener\Http\Exception\RequestException;
+use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
 /**
  * Request
@@ -75,7 +76,7 @@ class Request
         }
         // headers
         if ( $this->_headers ) {
-            $header .= implode(PHP_EOL, $this->_headers);
+            $header .= $this->_headers->toString();
         }
         $datas = $this->_postDatas;
         if ( is_array($datas) && count($datas) > 0 ) {
@@ -349,11 +350,11 @@ class Request
     /**
      * setHeaders
      * 
-     * @param array $headers Headers
+     * @param RequestHeaderBag $headers Headers
      * 
      * @return Request
      */
-    public function setHeaders($headers)
+    public function setHeaders(RequestHeaderBag $headers)
     {
         $this->_headers = $headers;
         return $this;

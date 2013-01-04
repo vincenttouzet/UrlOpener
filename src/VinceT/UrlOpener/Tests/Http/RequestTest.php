@@ -14,6 +14,7 @@ namespace VinceT\UrlOpener\Tests\Http;
 use VinceT\UrlOpener\Http\Request;
 use VinceT\UrlOpener\Http\Cookie\Cookie;
 use VinceT\UrlOpener\Http\Exception\RequestException;
+use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
 /**
  * Request test class
@@ -125,7 +126,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setUrl('http://www.urlopener.localhost/examples/pages/headers.php');
         $ua = 'My user agent';
-        $request->setHeaders(array('User-Agent: '.$ua));
+        $headers = new RequestHeaderBag();
+        $headers->setUserAgent($ua);
+        $request->setHeaders($headers);
         $content = $request->open();
         $this->assertEquals('User agent is: '.$ua, $content);
     }

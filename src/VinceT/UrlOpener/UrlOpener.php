@@ -15,6 +15,7 @@ use VinceT\UrlOpener\Http\Request;
 use VinceT\UrlOpener\Http\Response;
 use VinceT\UrlOpener\Http\Cookie\Cookie;
 use VinceT\UrlOpener\Http\Cookie\CookieMemoryStorage;
+use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
 /**
  * UrlOpener class
@@ -46,8 +47,11 @@ class UrlOpener
      *
      * @return Response
      */
-    public function open($url, $datas=array(), $headers = array())
+    public function open($url, $datas=array(), RequestHeaderBag $headers = null)
     {
+        if ( is_null($headers) ) {
+            $headers = new RequestHeaderBag();
+        }
         $request = new Request();
         $request->setUrl($url);
         // get cookies to send
@@ -60,14 +64,11 @@ class UrlOpener
         $response = new Response();
         $response->setContent($content);
         $response->setHeaders($request->getResponseHeaders());
-        foreach ( $response->getHeaders() as $header ) {
-            $cookie = Cookie::fromHeader($header);
-            if ( !is_null($cookie) ) {
-                if ( !$cookie->getDomain() ) {
-                    $cookie->setDomain($request->getHost());
-                }
-                $this->_cookieStorage->store($cookie);
+        foreach ( $response->getHeaders()->getCookies()->all() as $cookie ) {
+            if ( !$cookie->getDomain() ) {
+                $cookie->setDomain($request->getHost());
             }
+            $this->_cookieStorage->store($cookie);    
         }
         return $response;
     }
