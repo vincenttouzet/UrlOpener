@@ -179,7 +179,7 @@ class HeaderBag
                 $cookie = Cookie::fromHeader($header);
                 $this->_cookies->store($cookie);
             } elseif ( 'Cookie' === $name ) {
-                $cookies = explode(',', $value);
+                $cookies = explode(';', $value);
                 foreach ($cookies as $key_val) {
                     list($cname, $cvalue) = explode('=', trim($key_val));
                     $this->_cookies->store(new Cookie($cname, $cvalue));

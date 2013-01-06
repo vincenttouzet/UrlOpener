@@ -117,7 +117,7 @@ class CookieMemoryStorage implements CookieStorageInterface
      */
     public function getDomainCookies($domain)
     {
-        $cookies = array();
+        $cookies = new CookieMemoryStorage();
         foreach ($this->cookies as $i=>$c) {
             $pattern = str_replace('.', '\\.', $c->getDomain());
             if ( $pattern[0] === '\\' ) {
@@ -125,7 +125,7 @@ class CookieMemoryStorage implements CookieStorageInterface
             }
             $pattern = sprintf('/^%s$/', $pattern);
             if ( preg_match($pattern, $domain) ) {
-                $cookies[] = $c;
+                $cookies->store($c);
             }
         }
         return $cookies;
@@ -174,4 +174,5 @@ class CookieMemoryStorage implements CookieStorageInterface
     {
         return true;
     }
+
 }

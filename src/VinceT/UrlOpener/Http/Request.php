@@ -42,6 +42,14 @@ class Request
     private $_responseHeaders = array();
 
     /**
+     * __construct
+     */
+    public function __construct()
+    {
+        $this->setHeaders(new RequestHeaderBag());
+    }
+
+    /**
      * Open url
      *
      * @return string
@@ -58,40 +66,26 @@ class Request
                 'bindto' => $this->_ip.':0'
             );
         }
-        $header = '';
-        // cookies
-        if ( $this->_cookies ) {
-            $cookie_header = '';
-            foreach ($this->_cookies as $c) {
-                if ( $cookie_header !== '' ) {
-                    $cookie_header .= '; ';
-                }
-                $cookie_header .= sprintf(
-                    '%s=%s',
-                    $c->getName(),
-                    $c->getValue()
-                );
-            }
-            $header = 'Cookie: '.$cookie_header.PHP_EOL;
-        }
         // headers
-        if ( $this->_headers ) {
-            $header .= $this->_headers->toString();
-        }
+        $header = '';
+        $this->_headers->setCookies($this->_cookies);
+        
         $datas = $this->_postDatas;
         if ( is_array($datas) && count($datas) > 0 ) {
             // POST datas
             $postdata = http_build_query($datas);
+            $this->_headers->setContentType('application/x-www-form-urlencoded');
 
             $opts['http'] = array(
                 'method'  => 'POST',
-                'header'  => 'Content-type: application/x-www-form-urlencoded'.PHP_EOL.$header,
-                'content' => $postdata
+                'header'  => $this->_headers->toString(),
+                'content' => $postdata,
             );
         } else {
+            $this->_headers->setContentType('text/html; charset=utf-8');
             $opts['http'] = array(
-                'method'  => 'GET', 
-                'header'=>'Content-Type: text/html; charset=utf-8'.PHP_EOL.$header 
+                'method' => 'GET', 
+                'header' => $this->_headers->toString(),
             );
         }
         // use context
@@ -359,7 +353,7 @@ class Request
         $this->_headers = $headers;
         return $this;
     }
-    
+
     /**
      * setIp
      * 

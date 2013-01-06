@@ -80,10 +80,10 @@ class CookieMemoryStorageTest extends \PHPUnit_Framework_TestCase
         $cookieStorage->store($c4);
 
         $cookies = $cookieStorage->getDomainCookies('example.com');
-        $this->assertEquals(count($cookies), 2);
+        $this->assertEquals($cookies->count(), 2);
 
         $cookies = $cookieStorage->getDomainCookies('www.example.com');
-        $this->assertEquals(count($cookies), 3);
+        $this->assertEquals($cookies->count(), 3);
     }
 
     /**

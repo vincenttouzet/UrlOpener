@@ -13,6 +13,7 @@ namespace VinceT\UrlOpener\Tests\Http;
 
 use VinceT\UrlOpener\Http\Request;
 use VinceT\UrlOpener\Http\Cookie\Cookie;
+use VinceT\UrlOpener\Http\Cookie\CookieMemoryStorage;
 use VinceT\UrlOpener\Http\Exception\RequestException;
 use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
@@ -82,18 +83,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testCookies()
     {
+        $cookieStorage = new CookieMemoryStorage();
+
         $request = new Request();
         $request->setUrl('http://www.urlopener.localhost/examples/pages/cookie2.php');
         $content = $request->open();
         $this->assertEquals('KO', $content);
-        $request->setCookies(
-            array(new Cookie('auth', 'ok'))
-        );
+
+        $cookieStorage->store(new Cookie('auth', 'ok'));
+        $request->setCookies($cookieStorage);
         $content = $request->open();
         $this->assertEquals('OK', $content);
-        $request->setCookies(
-            array(new Cookie('auth', 'ok'), new Cookie('name', 'admin'))
-        );
+
+        $cookieStorage->store(new Cookie('name', 'admin'));
+        $request->setCookies($cookieStorage);
         $content = $request->open();
         $this->assertEquals('Hello admin', $content);
     }

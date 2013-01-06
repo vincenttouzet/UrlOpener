@@ -11,7 +11,7 @@
 
 namespace VinceT\UrlOpener\Http;
 
-use VinceT\UrlOpener\Http\Header\HeaderBag;
+use VinceT\UrlOpener\Http\Header\ResponseHeaderBag;
 
 /**
  * Response
@@ -45,7 +45,7 @@ class Response
     /**
      * getHeaders
      * 
-     * @return [type]
+     * @return ResponseHeaderBag
      */
     public function getHeaders()
     {
@@ -55,13 +55,13 @@ class Response
     /**
      * setHeaders
      * 
-     * @param [type] $headers [description]
+     * @param array $headers Raw headers
      * 
-     * @return null
+     * @return Response
      */
     public function setHeaders($headers)
     {
-        $this->_headers = new HeaderBag();
+        $this->_headers = new ResponseHeaderBag();
         $this->_headers->setRawHeaders($headers);
         return $this;
     }
@@ -79,7 +79,7 @@ class Response
     /**
      * setContent
      * 
-     * @param [type] $content [description]
+     * @param string $content Content of the response
      * 
      * @return null
      */

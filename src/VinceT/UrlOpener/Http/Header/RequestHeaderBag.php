@@ -36,7 +36,7 @@ class RequestHeaderBag extends HeaderBag
             foreach ($cookieStorage->all() as $cookie) {
                 $cookies[]= $cookie->getName().'='.$cookie->getValue();
             }
-            $ret[]= 'Cookie: '.implode(', ', $cookies);
+            $ret[]= 'Cookie: '.implode('; ', $cookies);
         }
         return $ret;
     }
