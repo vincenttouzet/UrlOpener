@@ -23,25 +23,41 @@ namespace VinceT\UrlOpener\Http\Header;
 class ResponseHeaderBag extends HeaderBag
 {
     /**
-     * Gets Acces-Control-Allow-Origin header
+     * Builds raw headers
+     *
+     * @return array
+     */
+    public function buildRawHeaders()
+    {
+        $ret = parent::buildRawHeaders();
+        if ( $cookieStorage = $this->getCookies() ) {
+            foreach ($cookieStorage->all() as $cookie) {
+                $ret[]= 'Set-Cookie: '.$cookie->__toString();
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * Gets Access-Control-Allow-Origin header
      * 
      * @return string|null
      */
-    public function getAccesControlAllowOrigin()
+    public function getAccessControlAllowOrigin()
     {
-        return $this->get('Acces-Control-Allow-Origin');
+        return $this->get('Access-Control-Allow-Origin');
     }
     
     /**
-     * Sets Acces-Control-Allow-Origin header
+     * Sets Access-Control-Allow-Origin header
      * 
-     * @param string $accesControlAllowOrigin Acces-Control-Allow-Origin header
+     * @param string $accessControlAllowOrigin Access-Control-Allow-Origin header
      * 
      * @return ResponseHeaderBag
      */
-    public function setAccesControlAllowOrigin($accesControlAllowOrigin)
+    public function setAccessControlAllowOrigin($accessControlAllowOrigin)
     {
-        $this->set('Acces-Control-Allow-Origin', $accesControlAllowOrigin);
+        $this->set('Access-Control-Allow-Origin', $accessControlAllowOrigin);
         return $this;
     }
 
@@ -625,10 +641,10 @@ class ResponseHeaderBag extends HeaderBag
      * 
      * @return string|null
      */
-    public function getSetCookie()
+    /*public function getSetCookie()
     {
         return $this->get('Set-Cookie');
-    }
+    }*/
     
     /**
      * Sets Set-Cookie header
@@ -637,11 +653,11 @@ class ResponseHeaderBag extends HeaderBag
      * 
      * @return ResponseHeaderBag
      */
-    public function setSetCookie($setCookie)
+    /*public function setSetCookie($setCookie)
     {
         $this->set('Set-Cookie', $setCookie);
         return $this;
-    }
+    }*/
     
     /**
      * Gets Strict-Transport-Security header
@@ -690,25 +706,25 @@ class ResponseHeaderBag extends HeaderBag
     }
     
     /**
-     * Gets Transfert-Encoding header
+     * Gets Transfer-Encoding header
      * 
      * @return string|null
      */
-    public function getTransfertEncoding()
+    public function getTransferEncoding()
     {
-        return $this->get('Transfert-Encoding');
+        return $this->get('Transfer-Encoding');
     }
     
     /**
-     * Sets Transfert-Encoding header
+     * Sets Transfer-Encoding header
      * 
-     * @param string $transfertEncoding Transfert-Encoding header
+     * @param string $transferEncoding Transfer-Encoding header
      * 
      * @return ResponseHeaderBag
      */
-    public function setTransfertEncoding($transfertEncoding)
+    public function setTransferEncoding($transferEncoding)
     {
-        $this->set('Transfert-Encoding', $transfertEncoding);
+        $this->set('Transfer-Encoding', $transferEncoding);
         return $this;
     }
 

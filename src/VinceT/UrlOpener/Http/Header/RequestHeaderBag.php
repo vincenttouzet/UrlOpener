@@ -22,6 +22,25 @@ namespace VinceT\UrlOpener\Http\Header;
  */
 class RequestHeaderBag extends HeaderBag
 {
+
+    /**
+     * Builds raw headers
+     *
+     * @return array
+     */
+    public function buildRawHeaders()
+    {
+        $ret = parent::buildRawHeaders();
+        if ( $cookieStorage = $this->getCookies() ) {
+            $cookies = array();
+            foreach ($cookieStorage->all() as $cookie) {
+                $cookies[]= $cookie->getName().'='.$cookie->getValue();
+            }
+            $ret[]= 'Cookie: '.implode(', ', $cookies);
+        }
+        return $ret;
+    }
+
     /**
      * Gets the Accept header
      * 
@@ -211,10 +230,10 @@ class RequestHeaderBag extends HeaderBag
      * 
      * @return string|null
      */
-    public function getCookie()
+    /*public function getCookie()
     {
         return $this->get('Cookie');
-    }
+    }*/
     
     /**
      * Sets Cookie header
@@ -223,11 +242,11 @@ class RequestHeaderBag extends HeaderBag
      * 
      * @return RequestHeaderBag
      */
-    public function setCookie($cookie)
+    /*public function setCookie($cookie)
     {
         $this->set('Cookie', $cookie);
         return $this;
-    }
+    }*/
 
     /**
      * Gets Content-Length header

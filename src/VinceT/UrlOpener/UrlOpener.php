@@ -31,11 +31,11 @@ class UrlOpener
     private $_cookieStorage = null;
 
     /**
-     * [__construct description]
+     * __construct
      */
     public function __construct()
     {
-        $this->_cookieStorage = new CookieMemoryStorage();
+        $this->setCookieStorage(new CookieMemoryStorage());
     }
 
     /**
@@ -70,11 +70,12 @@ class UrlOpener
             }
             $this->_cookieStorage->store($cookie);    
         }
+        $this->_cookieStorage->save();
         return $response;
     }
 
     /**
-     * getCookieStorage
+     * Gets CookieStorage
      * 
      * @return \VinceT\UrlOpener\Http\Cookie\CookieStorageInterface
      */
@@ -82,5 +83,20 @@ class UrlOpener
     {
         return $this->_cookieStorage;
     }
+
+    /**
+     * Sets CookieStorage
+     * 
+     * @param [type] $cookieStorage CookieStorage
+     * 
+     * @return [type]
+     */
+    public function setCookieStorage($cookieStorage)
+    {
+        $this->_cookieStorage = $cookieStorage;
+        $this->_cookieStorage->load();
+        return $this;
+    }
+    
 
 }

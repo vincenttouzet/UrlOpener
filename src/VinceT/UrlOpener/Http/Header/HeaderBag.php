@@ -86,16 +86,6 @@ class HeaderBag
             unset($this->_datas[$name]);
         }
     }
-
-    /**
-     * getRawHeaders
-     * 
-     * @return array
-     */
-    public function getRawHeaders()
-    {
-        return $this->rawHeaders;
-    }
     
     /**
      * setRawHeaders
@@ -141,7 +131,8 @@ class HeaderBag
      */
     public function toString()
     {
-        return $this->__toString();
+        $s = implode(PHP_EOL, $this->buildRawHeaders());
+        return $s;
     }
 
     /**
@@ -151,15 +142,25 @@ class HeaderBag
      */
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    /**
+     * Builds raw headers
+     *
+     * @return array
+     */
+    public function buildRawHeaders()
+    {
         $arr = $this->_datas;
         ksort($arr);
-        $s = '';
+        $ret = array();
         foreach ($arr as $key => $value) {
             if ( $key !== 'Cookie' && $key !== 'Set-Cookie' ) {
-                $s .= sprintf('%s: %s', $key, $value).PHP_EOL;
+                $ret[]= $key.':'.$value;
             }
         }
-        return $s;
+        return $ret;
     }
 
     /**
@@ -177,6 +178,12 @@ class HeaderBag
             if ( 'Set-Cookie' === $name ) {
                 $cookie = Cookie::fromHeader($header);
                 $this->_cookies->store($cookie);
+            } elseif ( 'Cookie' === $name ) {
+                $cookies = explode(',', $value);
+                foreach ($cookies as $key_val) {
+                    list($cname, $cvalue) = explode('=', trim($key_val));
+                    $this->_cookies->store(new Cookie($cname, $cvalue));
+                }
             } else {
                 if ( is_null($value) ) {
                     $value = $name;

@@ -67,7 +67,7 @@ class Cookie
     public static function fromHeader($header)
     {
         $cookie = null;
-        if ( preg_match('/^Set-Cookie: (.*)/', $header, $matches) ) {
+        if ( preg_match('/^Set-Cookie:\s*(.*)/', $header, $matches) ) {
             $raw = $matches[1];
             $raw_array = explode(';', $raw);
             $name_val = array_shift($raw_array);

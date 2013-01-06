@@ -39,6 +39,9 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('My user agent is good !', $headers->get('User-Agent'));
         $this->assertTrue($headers->has('User-Agent'));
         $headers->remove('User-Agent');
+
+        $this->assertEquals($headers->__toString(), $headers->toString());
+        
         $this->assertEquals(null, $headers->get('User-Agent'));
         $this->assertFalse($headers->has('User-Agent'));
     }
