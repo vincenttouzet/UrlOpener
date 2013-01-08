@@ -12,7 +12,15 @@ require_once 'path/to/UrlOpener/src/autoload.php';
 use VinceT\UrlOpener\UrlOpener;
 use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
-$urlOpener = new UrlOpener();
+// use config to set specific options
+// default values are:
+$config = array(
+    'USE_CURL' => false, // set to true to use curl instead of file_get_contents
+    'USE_IP' => false, // if you want to make requests from a specific IP 
+    'COOKIE_FILE' => null, // if you want to store cookies into a file, give the file name
+);
+
+$urlOpener = new UrlOpener($config);
 
 $postDatas = array(
     'my_var' => 'the value',
