@@ -15,6 +15,8 @@ use VinceT\UrlOpener\Http\Request;
 use VinceT\UrlOpener\Http\Response;
 use VinceT\UrlOpener\Http\Cookie\Cookie;
 use VinceT\UrlOpener\Http\Cookie\CookieMemoryStorage;
+use VinceT\UrlOpener\Http\Cookie\CookieFileStorage;
+use VinceT\UrlOpener\Http\Cookie\CookieStorageInterface;
 use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
 
 /**
@@ -31,8 +33,9 @@ class UrlOpener
     private $_cookieStorage = null;
 
     public $config = array(
-        'useCurl' => false, // set to true to use curl instead of file_get_contents
-        'useIp' => false, // if you want to make requests from a specific IP 
+        'USE_CURL' => false, // set to true to use curl instead of file_get_contents
+        'USE_IP' => false, // if you want to make requests from a specific IP 
+        'COOKIE_FILE' => null, // if you want to store cookies into a file, give the file name
     );
 
     /**
@@ -43,7 +46,13 @@ class UrlOpener
     public function __construct($config = array())
     {
         $this->config = array_merge($this->config, $config);
-        $this->setCookieStorage(new CookieMemoryStorage());
+        if ( is_string($this->config['COOKIE_FILE']) ) {
+            $cookieStorage = new CookieFileStorage();
+            $cookieStorage->setFileName($this->config['COOKIE_FILE']);
+        } else {
+            $cookieStorage = new CookieMemoryStorage();
+        }
+        $this->setCookieStorage($cookieStorage);
     }
 
     /**
@@ -61,9 +70,9 @@ class UrlOpener
             $headers = new RequestHeaderBag();
         }
         $request = new Request();
-        $request->setUseCurl($this->config['useCurl']);
-        if ( $this->config['useIp'] !== false ) {
-            $request->setIp($this->config['useIp']);
+        $request->setUseCurl($this->config['USE_CURL']);
+        if ( $this->config['USE_IP'] !== false ) {
+            $request->setIp($this->config['USE_IP']);
         }
         $request->setUrl($url);
         // get cookies to send
@@ -96,11 +105,11 @@ class UrlOpener
     /**
      * Sets CookieStorage
      * 
-     * @param [type] $cookieStorage CookieStorage
+     * @param CookieStorageInterface $cookieStorage CookieStorage
      * 
-     * @return [type]
+     * @return UrlOpener
      */
-    public function setCookieStorage($cookieStorage)
+    public function setCookieStorage(CookieStorageInterface $cookieStorage)
     {
         $this->_cookieStorage = $cookieStorage;
         $this->_cookieStorage->load();

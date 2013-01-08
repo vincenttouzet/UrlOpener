@@ -84,20 +84,28 @@ class UrlOpenerTest extends \PHPUnit_Framework_TestCase
     public function testConfig()
     {
         $config = array(
-            'useCurl' => true,
-            'useIp' => '192.168.1.15',
+            'USE_CURL' => true,
+            'USE_IP' => '192.168.1.15',
         );
         $urlopener = new UrlOpener($config);
         $response = $urlopener->open('http://www.urlopener.localhost/examples/pages/ip.php');
         $this->assertEquals('192.168.1.15', $response->getContent());
         $config = array(
-            'useCurl' => false,
-            'useIp' => '127.0.0.1',
+            'USE_CURL' => false,
+            'USE_IP' => '127.0.0.1',
         );
         $urlopener = new UrlOpener($config);
         $response = $urlopener->open('http://www.urlopener.localhost/examples/pages/ip.php');
         $this->assertEquals('127.0.0.1', $response->getContent());
 
+
+        $config = array(
+            'COOKIE_FILE' => '/tmp/urlopener.cookies',
+        );
+        $urlopener = new UrlOpener($config);
+        $this->assertTrue($urlopener->getCookieStorage() instanceof \VinceT\UrlOpener\Http\Cookie\CookieFileStorage);
+        $urlopener = new UrlOpener();
+        $this->assertTrue($urlopener->getCookieStorage() instanceof \VinceT\UrlOpener\Http\Cookie\CookieMemoryStorage);
     }
 
 }
