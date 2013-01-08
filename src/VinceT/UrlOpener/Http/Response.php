@@ -26,20 +26,29 @@ class Response
 {
     private $_headers = array();
     private $_content = null;
+    private $_statusCode = null;
 
     /**
-     * Gets the response status code
-     *
+     * Gets StatusCode
+     * 
      * @return string
      */
     public function getStatusCode()
     {
-        $header = $this->_headers->get(0);
-        $code = null;
-        if ( $header ) {
-            list($http, $code, $message) = explode(' ', $header, 3);
-        }
-        return $code;
+        return $this->_statusCode;
+    }
+    
+    /**
+     * Sets StatusCode
+     * 
+     * @param string $statusCode StatusCode
+     * 
+     * @return Response
+     */
+    public function setStatusCode($statusCode)
+    {
+        $this->_statusCode = $statusCode;
+        return $this;
     }
 
     /**

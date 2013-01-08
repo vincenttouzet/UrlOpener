@@ -30,20 +30,28 @@ class UrlOpener
 {
     private $_cookieStorage = null;
 
+    public $config = array(
+        'useCurl' => false, // set to true to use curl instead of file_get_contents
+        'useIp' => false, // if you want to make requests from a specific IP 
+    );
+
     /**
      * __construct
+     *
+     * @param array $config Configuration list
      */
-    public function __construct()
+    public function __construct($config = array())
     {
+        $this->config = array_merge($this->config, $config);
         $this->setCookieStorage(new CookieMemoryStorage());
     }
 
     /**
      * open an url
      *
-     * @param string $url     [description]
-     * @param array  $datas   [description]
-     * @param array  $headers [description]
+     * @param string $url     Url to load
+     * @param array  $datas   Post datas
+     * @param array  $headers Additional headers
      *
      * @return Response
      */
@@ -53,17 +61,18 @@ class UrlOpener
             $headers = new RequestHeaderBag();
         }
         $request = new Request();
+        $request->setUseCurl($this->config['useCurl']);
+        if ( $this->config['useIp'] !== false ) {
+            $request->setIp($this->config['useIp']);
+        }
         $request->setUrl($url);
         // get cookies to send
         $cookies = $this->_cookieStorage->getDomainCookies($request->getHost());
         $request->setCookies($cookies);
         $request->setPostDatas($datas);
         $request->setHeaders($headers);
-        $content = $request->open();
+        $response = $request->open();
 
-        $response = new Response();
-        $response->setContent($content);
-        $response->setHeaders($request->getResponseHeaders());
         foreach ( $response->getHeaders()->getCookies()->all() as $cookie ) {
             if ( !$cookie->getDomain() ) {
                 $cookie->setDomain($request->getHost());

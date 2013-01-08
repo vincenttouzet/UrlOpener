@@ -45,6 +45,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/path', $request->getPath());
         $this->assertEquals('arg=value', $request->getQuery());
         $this->assertEquals('anchor', $request->getFragment());
+        $request->setUseCurl(false);
+        $this->assertFalse($request->getUseCurl());
+        $request->setUseCurl(true);
+        $this->assertTrue($request->getUseCurl());
     }
 
     /**
@@ -54,10 +58,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testOpen()
     {
+        $this->_testOpen(false);
+        $this->_testOpen(true);
+    }
+
+    /**
+     * [_testCookies description]
+     *
+     * @param Boolean $curl Weither curl is used to make the request
+     *
+     * @return null
+     */
+    private function _testOpen($curl)
+    {
         $request = new Request();
         $request->setUrl('http://www.urlopener.localhost/examples/pages/get.html');
-        $content = $request->open();
-        $this->assertEquals('This file is loaded with UrlOpener', $content);
+        $response = $request->open();
+        $this->assertEquals('This file is loaded with UrlOpener', $response->getContent());
     }
 
     /**
@@ -67,13 +84,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testIp()
     {
+        $this->_testIp(false);
+        $this->_testIp(true);
+    }
+
+    /**
+     * [_testCookies description]
+     *
+     * @param Boolean $curl Weither curl is used to make the request
+     *
+     * @return null
+     */
+    private function _testIp($curl)
+    {
         $request = new Request();
+        $request->setUseCurl($curl);
         $request->setUrl('http://www.urlopener.localhost/examples/pages/ip.php');
-        $content = $request->open();
-        $this->assertEquals('127.0.0.1', $content);
+        $response = $request->open();
+        $this->assertEquals('127.0.0.1', $response->getContent());
         $request->setIp('192.168.1.15');
-        $content = $request->open();
-        $this->assertEquals('192.168.1.15', $content);
+        $response = $request->open();
+        $this->assertEquals('192.168.1.15', $response->getContent());
     }
 
     /**
@@ -83,22 +114,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testCookies()
     {
+        $this->_testCookies(false);
+        $this->_testCookies(true);
+    }
+
+    /**
+     * [_testCookies description]
+     *
+     * @param Boolean $curl Weither curl is used to make the request
+     *
+     * @return null
+     */
+    private function _testCookies($curl)
+    {
         $cookieStorage = new CookieMemoryStorage();
 
         $request = new Request();
+        $request->setUseCurl($curl);
         $request->setUrl('http://www.urlopener.localhost/examples/pages/cookie2.php');
-        $content = $request->open();
-        $this->assertEquals('KO', $content);
+        $response = $request->open();
+        $this->assertEquals('KO', $response->getContent());
 
         $cookieStorage->store(new Cookie('auth', 'ok'));
         $request->setCookies($cookieStorage);
-        $content = $request->open();
-        $this->assertEquals('OK', $content);
+        $response = $request->open();
+        $this->assertEquals('OK', $response->getContent());
 
         $cookieStorage->store(new Cookie('name', 'admin'));
         $request->setCookies($cookieStorage);
-        $content = $request->open();
-        $this->assertEquals('Hello admin', $content);
+        $response = $request->open();
+        $this->assertEquals('Hello admin', $response->getContent());
     }
 
     /**
@@ -108,15 +153,29 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testPost()
     {
+        $this->_testPost(false);
+        $this->_testPost(true);
+    }
+
+    /**
+     * [_testPost description]
+     *
+     * @param Boolean $curl Weither curl is used to make the request
+     *
+     * @return null
+     */
+    private function _testPost($curl)
+    {
         $request = new Request();
+        $request->setUseCurl($curl);
         $request->setUrl('http://www.urlopener.localhost/examples/pages/post.php');
-        $content = $request->open();
-        $this->assertEquals('Failed to auth', $content);
+        $response = $request->open();
+        $this->assertEquals('Failed to auth', $response->getContent());
         $request->setPostDatas(
             array('auth'=>'ok')
         );
-        $content = $request->open();
-        $this->assertEquals('Auth is ok', $content);
+        $response = $request->open();
+        $this->assertEquals('Auth is ok', $response->getContent());
     }
 
     /**
@@ -126,14 +185,29 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testHeaders()
     {
+        $this->_testHeaders(false);
+        $this->_testHeaders(true);
+    }
+
+
+    /**
+     * [_testHeaders description]
+     *
+     * @param Boolean $curl Weither curl is used to make the request
+     *
+     * @return null
+     */
+    private function _testHeaders($curl)
+    {
         $request = new Request();
+        $request->setUseCurl($curl);
         $request->setUrl('http://www.urlopener.localhost/examples/pages/headers.php');
         $ua = 'My user agent';
         $headers = new RequestHeaderBag();
         $headers->setUserAgent($ua);
         $request->setHeaders($headers);
-        $content = $request->open();
-        $this->assertEquals('User agent is: '.$ua, $content);
+        $response = $request->open();
+        $this->assertEquals('User agent is: '.$ua, $response->getContent());
     }
 
     /**
@@ -157,6 +231,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testExceptionNoUrlGiven()
     {
         $request = new Request();
+        $request->open();
+    }
+
+    /**
+     * test relative url
+     *
+     * @expectedException \VinceT\UrlOpener\Http\Exception\RequestException
+     * @return null
+     */
+    public function testExceptionCurlError()
+    {
+        $request = new Request();
+        $request->setUseCurl(true);
+        $request->setUrl('http://test.exception.curl.error.urlopener.com');
         $request->open();
     }
 }

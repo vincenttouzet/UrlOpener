@@ -185,10 +185,6 @@ class HeaderBag
                     $this->_cookies->store(new Cookie($cname, $cvalue));
                 }
             } else {
-                if ( is_null($value) ) {
-                    $value = $name;
-                    $name = 0;
-                }
                 $this->set($name, $value);
             }
         }

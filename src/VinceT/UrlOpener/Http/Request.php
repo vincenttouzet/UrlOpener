@@ -13,6 +13,7 @@ namespace VinceT\UrlOpener\Http;
 
 use VinceT\UrlOpener\Http\Exception\RequestException;
 use VinceT\UrlOpener\Http\Header\RequestHeaderBag;
+use VinceT\UrlOpener\Http\Response;
 
 /**
  * Request
@@ -39,7 +40,8 @@ class Request
     private $_cookies = array();
     private $_headers = array();
     private $_ip = null;
-    private $_responseHeaders = array();
+
+    private $_useCurl = true;
 
     /**
      * __construct
@@ -52,13 +54,84 @@ class Request
     /**
      * Open url
      *
-     * @return string
+     * @return Response
      */
     public function open()
     {
         if ( !$this->_url ) {
             throw new RequestException('No url given', 1);
         }
+        $res = null;
+        if ( $this->getUseCurl() && function_exists('curl_init') ) {
+            $res = $this->openCurl();
+        } else {
+            $res = $this->openFileGetContents();
+        }
+        return $res;
+    }
+
+    /**
+     * Open url with curl
+     *
+     * @return Response
+     */
+    protected function openCurl()
+    {
+        $this->_headers->setCookies($this->_cookies);
+
+        $curl_handle = curl_init();
+
+        curl_setopt($curl_handle, CURLOPT_URL, $this->_url);
+        // include Response header in return value
+        curl_setopt($curl_handle, CURLOPT_HEADER, true);
+        curl_setopt($curl_handle, CURLOPT_NOBODY, false);
+        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $this->_headers->buildRawHeaders());
+
+        if ( $this->_ip ) {
+            curl_setopt($curl_handle, CURLOPT_INTERFACE, $this->_ip);
+        }
+
+        $datas = $this->_postDatas;
+        if ( is_array($datas) && count($datas) > 0 ) {
+            //curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($curl_handle, CURLOPT_POST, 1);
+            curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $datas);
+        }
+
+        $res = curl_exec($curl_handle);
+
+        if ( !$res ) {
+            throw new RequestException(curl_error($curl_handle), 1);
+        }
+
+        $headerSize = curl_getinfo($curl_handle, CURLINFO_HEADER_SIZE);
+        $header = substr($res, 0, $headerSize);
+        $body = substr($res, $headerSize);
+
+        $lines = explode(PHP_EOL, $header);
+        $headers = array();
+        foreach ($lines as $line) {
+            if ( preg_match('/.*:.*/', $line) ) {
+                $headers[] = trim($line);
+            }
+        }
+        $response = new Response();
+        $response->setContent($body);
+        $response->setHeaders($headers);
+        $response->setStatusCode(curl_getinfo($curl_handle, CURLINFO_HTTP_CODE));
+        curl_close($curl_handle);
+
+        return $response;
+    }
+    
+    /**
+     * Open url with file_get_contents
+     *
+     * @return Response
+     */
+    protected function openFileGetContents()
+    {
         $opts = array();
         // check if run from specific IP
         if ( $this->_ip ) {
@@ -91,11 +164,18 @@ class Request
         // use context
         $context  = stream_context_create($opts);
         $res = file_get_contents($this->_url, false, $context);
-        $this->_responseHeaders = $http_response_header;
 
-        return $res;
+        $ret = array_shift($http_response_header);
+        list($http, $code, $message) = explode(' ', $ret, 3);
+
+        $response = new Response();
+        $response->setContent($res);
+        $response->setHeaders($http_response_header);
+        $response->setStatusCode($code);
+
+        return $response;
     }
-    
+
     /**
      * setUrl
      * 
@@ -368,13 +448,27 @@ class Request
     }
 
     /**
-     * getResponseHeaders
+     * Gets UseCurl
      * 
-     * @return array
+     * @return Boolean
      */
-    public function getResponseHeaders()
+    public function getUseCurl()
     {
-        return $this->_responseHeaders;
+        return $this->_useCurl;
     }
+    
+    /**
+     * Sets UseCurl
+     * 
+     * @param Boolean $useCurl UseCurl
+     * 
+     * @return Request
+     */
+    public function setUseCurl($useCurl)
+    {
+        $this->_useCurl = $useCurl;
+        return $this;
+    }
+    
     
 }
