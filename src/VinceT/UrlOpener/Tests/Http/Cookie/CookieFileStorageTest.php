@@ -77,15 +77,14 @@ class CookieFileStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test exception thrown during save
+     * Test file does not exist
      * 
-     * @expectedException InvalidArgumentException
      * @return null
      */
     public function testExceptionLoadFileNotFound()
     {
         $cookieStorage = new CookieFileStorage();
         $cookieStorage->setFileName('/file/that/does/not/exist');
-        $cookieStorage->load();
+        $this->assertFalse($cookieStorage->load());
     }
 }

@@ -72,7 +72,7 @@ class CookieFileStorage extends CookieMemoryStorage
             throw new \InvalidArgumentException('Filename for cookie storage is not set.', 1);
         }
         if ( !file_exists($file) ) {
-            throw new \InvalidArgumentException(sprintf('File "%s" does not exist.', $file), 1);
+            return false;
         }
         $this->cookies = unserialize(file_get_contents($file));
         return true;
